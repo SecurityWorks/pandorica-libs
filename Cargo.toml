@@ -3,6 +3,7 @@ members = [
     "crypto",
     "foreign",
     "identifier",
+    "protobuf",
     "shared",
     "singleton",
     "singleton-derive",
