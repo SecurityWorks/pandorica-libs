@@ -1,0 +1,9 @@
+[workspace]
+members = [
+    "crypto",
+    "foreign",
+    "identifier",
+    "shared",
+    "singleton",
+    "singleton-derive",
+]
