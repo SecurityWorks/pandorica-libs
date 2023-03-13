@@ -1,0 +1,14 @@
+syntax = "proto3";
+import "common.proto";
+package pandorica_user;
+
+message MeRequest {}
+
+message MeResponse {
+  pandorica_common.User user = 1;
+  repeated pandorica_common.Session sessions = 2;
+}
+
+service UserService {
+  rpc Me (MeRequest) returns (MeResponse);
+}

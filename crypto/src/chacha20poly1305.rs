@@ -6,13 +6,10 @@ use chacha20poly1305::{Key, KeyInit, XChaCha20Poly1305, XNonce};
 use secret_vault_value::SecretValue;
 use shared::error::OperationResult;
 
-use crate::traits::EncryptionProvider;
-
-#[derive(Clone)]
 pub struct ChaCha20Poly1305;
 
-impl EncryptionProvider for ChaCha20Poly1305 {
-    fn encrypt(
+impl ChaCha20Poly1305 {
+    pub fn encrypt(
         plaintext: &SecretValue,
         key: &SecretValue,
         nonce: &[u8],
@@ -26,7 +23,11 @@ impl EncryptionProvider for ChaCha20Poly1305 {
         Ok(ciphertext)
     }
 
-    fn decrypt(ciphertext: &[u8], key: &SecretValue, nonce: &[u8]) -> OperationResult<SecretValue> {
+    pub fn decrypt(
+        ciphertext: &[u8],
+        key: &SecretValue,
+        nonce: &[u8],
+    ) -> OperationResult<SecretValue> {
         let key = Key::from_slice(key.as_sensitive_bytes());
         let nonce = XNonce::from_slice(nonce);
         let cipher = XChaCha20Poly1305::new(key);
@@ -36,7 +37,7 @@ impl EncryptionProvider for ChaCha20Poly1305 {
         Ok(plaintext.into())
     }
 
-    fn encrypt_aead(
+    pub fn encrypt_aead(
         plaintext: &mut File,
         key: &[u8],
         nonce: &[u8],
@@ -65,7 +66,7 @@ impl EncryptionProvider for ChaCha20Poly1305 {
         Ok(())
     }
 
-    fn decrypt_aead(
+    pub fn decrypt_aead(
         ciphertext: &mut File,
         key: &[u8],
         nonce: &[u8],

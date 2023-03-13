@@ -5,12 +5,6 @@ pub trait IntoKey {
     fn get_key(&self) -> String;
 }
 
-impl<T: IntoKey + Serialize> IntoKey for Vec<T> {
-    fn get_key(&self) -> String {
-        self.iter().map(|e| e.get_key()).collect()
-    }
-}
-
 impl<T: IntoKey + Serialize> IntoKey for Box<T> {
     fn get_key(&self) -> String {
         self.as_ref().get_key()

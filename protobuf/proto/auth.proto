@@ -15,7 +15,7 @@ message LoginRequest {
 
 message AuthResponse {
   pandorica_common.User user = 1;
-  string authorization_code = 2;
+  pandorica_common.Session session = 2;
 }
 
 service AuthService {
