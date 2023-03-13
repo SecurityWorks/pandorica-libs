@@ -1,4 +1,5 @@
-pub mod argon2id;
-pub mod chacha20poly1305;
+pub mod encryption;
+pub mod hashing;
 pub mod hsm;
-pub mod xxhash3;
+pub mod key_derivation;
+pub mod traits;

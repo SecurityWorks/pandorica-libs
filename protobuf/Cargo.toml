@@ -4,9 +4,8 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-prost = "^0.11.6"
 tonic = "^0.8.3"
+prost = "^0.11.6"
 
 [build-dependencies]
 tonic-build = { version="^0.8.4", features=["prost"] }
-tonic-types = "^0.6.1"

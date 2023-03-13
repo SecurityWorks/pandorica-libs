@@ -9,15 +9,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .build_client(true)
         .file_descriptor_set_path(out_dir.join("pandorica_descriptor.bin"))
         .include_file("pandorica_proto.rs")
-        .compile(
-            &[
-                "proto/auth.proto",
-                "proto/common.proto",
-                "proto/file.proto",
-                "proto/user.proto",
-            ],
-            &["proto"],
-        )?;
+        .compile(&["proto/common.proto", "proto/auth.proto"], &["proto"])?;
 
     Ok(())
 }

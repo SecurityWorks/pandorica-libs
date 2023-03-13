@@ -1,22 +1,25 @@
-use crate::hsm::GoogleCloudPlatformSettings;
 use gcloud_sdk::google::cloud::kms::v1::key_management_service_client::KeyManagementServiceClient;
 use gcloud_sdk::google::cloud::kms::v1::{DecryptRequest, GenerateRandomBytesRequest};
 use gcloud_sdk::proto_ext::kms::EncryptRequest;
 use gcloud_sdk::{GoogleApi, GoogleAuthMiddleware};
-use once_cell::sync::OnceCell;
 use secret_vault_value::SecretValue;
-use shared::error::OperationResult;
+use shared::error::{EmptyResult, OperationResult};
+use singleton::{async_trait, OnceCell};
 use tonic::metadata::MetadataValue;
 
+use crate::traits::CloudProvider;
+
+#[derive(Default)]
 pub struct Gcp {
     kms_service: OnceCell<GoogleApi<KeyManagementServiceClient<GoogleAuthMiddleware>>>,
     location: String,
     keyring: String,
 }
 
-impl Gcp {
-    pub async fn init(settings: &GoogleCloudPlatformSettings) -> OperationResult<Self> {
-        let kms_service = OnceCell::from(
+#[async_trait]
+impl CloudProvider for Gcp {
+    async fn init(&mut self, project_id: &str, location: &str, key_ring: &str) -> EmptyResult {
+        self.kms_service = OnceCell::from(
             GoogleApi::from_function(
                 KeyManagementServiceClient::new,
                 "https://cloudkms.googleapis.com",
@@ -25,21 +28,14 @@ impl Gcp {
             .await?,
         );
 
-        let location = format!(
-            "projects/{}/locations/{}",
-            settings.project_id, settings.location
-        );
+        self.location = format!("projects/{}/locations/{}", project_id, location);
 
-        let keyring = format!("{}/keyRings/{}/cryptoKeys", location, settings.key_ring);
+        self.keyring = format!("{}/keyRings/{}/cryptoKeys", self.location, key_ring);
 
-        Ok(Self {
-            kms_service,
-            location,
-            keyring,
-        })
+        Ok(())
     }
 
-    pub async fn encrypt_envelope(
+    async fn encrypt_envelope(
         &self,
         plaintext: SecretValue,
         key: &str,
@@ -72,11 +68,7 @@ impl Gcp {
         Ok(response.ciphertext)
     }
 
-    pub async fn decrypt_envelope(
-        &self,
-        ciphertext: &[u8],
-        key: &str,
-    ) -> OperationResult<SecretValue> {
+    async fn decrypt_envelope(&self, ciphertext: &[u8], key: &str) -> OperationResult<SecretValue> {
         let key = format!("{}/{}", self.keyring.clone(), key);
 
         let mut decrypt_request = tonic::Request::new(DecryptRequest {
@@ -105,7 +97,7 @@ impl Gcp {
         Ok(response.plaintext)
     }
 
-    pub async fn generate_random_bytes(&self, size: u32) -> OperationResult<Vec<u8>> {
+    async fn generate_random_bytes(&self, size: u32) -> OperationResult<Vec<u8>> {
         let mut generate_random_bytes_request = tonic::Request::new(GenerateRandomBytesRequest {
             location: self.location.clone(),
             length_bytes: size as i32,
