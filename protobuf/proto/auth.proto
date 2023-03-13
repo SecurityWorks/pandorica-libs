@@ -13,12 +13,17 @@ message LoginRequest {
   string password = 2;
 }
 
+message LogoutRequest {}
+
 message AuthResponse {
   pandorica_common.User user = 1;
   pandorica_common.Session session = 2;
 }
 
+message LogoutResponse {}
+
 service AuthService {
   rpc Register (RegistrationRequest) returns (AuthResponse);
   rpc Login (LoginRequest) returns (AuthResponse);
+  rpc Logout (LogoutRequest) returns (LogoutResponse);
 }
