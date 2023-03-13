@@ -5,5 +5,15 @@ message User {
   string id = 1;
   string username = 2;
   optional string email = 3;
-  bool is_active = 4;
+  int64 added_on = 4;
+  int64 last_seen_on = 5;
+  bool is_active = 6;
+}
+
+message Session {
+  string id = 1;
+  optional string user_id = 2;
+  int64 added_on = 3;
+  int64 last_used_on = 4;
+  int64 expires_on = 5;
 }
